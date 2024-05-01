@@ -4,5 +4,5 @@ project(aplusb CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(
-  sum.cpp src/main.cpp
+  sum src/main.cpp
 )
