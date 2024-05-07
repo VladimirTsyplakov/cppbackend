@@ -1,3 +1,0 @@
-/home/vladimir/cpp-backend/sprint1/problems/sum/solution/build/CMakeFiles/sum.dir
-/home/vladimir/cpp-backend/sprint1/problems/sum/solution/build/CMakeFiles/edit_cache.dir
-/home/vladimir/cpp-backend/sprint1/problems/sum/solution/build/CMakeFiles/rebuild_cache.dir
