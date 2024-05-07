@@ -53,15 +53,14 @@ StringResponse HandleRequest(StringRequest&& req) {
 		std::string_view tar = req.target();
     // Здесь можно обработать запрос и сформировать ответ, но пока всегда отвечаем: Hello
 //		greet = "<strong>Hello</strong>";
-		greet = "Hello";
+		greet = "Hello, ";
 		tar.remove_prefix(1);
 //		greet.insert(13, ", ");
-		greet.insert(5, ", ");
 //		greet.insert(15, tar);
 		greet.insert(7, tar);
 			 }
 	if(ques != "GET" && ques != "HEAD"){
-//	greet = "<strong>Invalid method</strong"; 
+//	greet = "<strong>Invalid method</strong";  
 	greet = "Invalid method";
 	stat = http::status::method_not_allowed;}
 

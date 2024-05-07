@@ -1,6 +1,6 @@
-#ifdef WIN32
-#include <sdkddkver.h>
-#endif
+//#ifdef WIN32
+//#include <sdkddkver.h>
+//#endif
 
 #include <boost/asio.hpp>
 #include <chrono>
