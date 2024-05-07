@@ -6,6 +6,8 @@
 #include <thread>
 #include <vector>
 
+#include <boost/asio/steady_timer.hpp>
+
 #include "http_server.h"
 
 namespace {
@@ -39,8 +41,30 @@ StringResponse MakeStringResponse(http::status status, std::string_view body, un
 
 StringResponse HandleRequest(StringRequest&& req) {
     // Подставьте сюда код из синхронной версии HTTP-сервера
-    return MakeStringResponse(http::status::ok, "OK"sv, req.version(), req.keep_alive());
-}
+    const auto text_response = [&req](http::status status, std::string_view text) {
+        return MakeStringResponse(status, text, req.version(), req.keep_alive());
+    };
+        std::string greet;
+        http::status stat = http::status::ok;
+        std::string_view ques = req.method_string();
+        if(ques == "GET"){
+                std::string_view tar = req.target();
+    // Здесь можно обработать запрос и сформировать ответ, но пока всегда отвечаем: Hello
+//              greet = "<strong>Hello</strong>";
+                greet = "Hello, ";
+                tar.remove_prefix(1);
+//              greet.insert(13, ", ");
+//              greet.insert(15, tar);
+                greet.insert(7, tar);
+                         }
+        if(ques != "GET" && ques != "HEAD"){
+//      greet = "<strong>Invalid method</strong";  
+        greet = "Invalid method";
+        stat = http::status::method_not_allowed;}
+
+        return text_response(stat, greet);
+} 
+
 
 // Запускает функцию fn на n потоках, включая текущий
 template <typename Fn>
@@ -50,7 +74,7 @@ void RunWorkers(unsigned n, const Fn& fn) {
     workers.reserve(n - 1);
     // Запускаем n-1 рабочих потоков, выполняющих функцию fn
     while (--n) {
-        workers.emplace_back(fn);
+   workers.emplace_back(fn);
     }
     fn();
 }
@@ -78,8 +102,14 @@ int main() {
 
     // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
     std::cout << "Server has started..."sv << std::endl;
-
+    
+    net::steady_timer t{ioc, 30s};
+    t.async_wait([](sys::error_code ec) {
+        std::cout << "Timer expired"s << std::endl;
+    });
+    
     RunWorkers(num_threads, [&ioc] {
         ioc.run();
     });
+    std::cout << "Shutting down"sv << std::endl;
 }
