@@ -103,12 +103,12 @@ int main() {
 
     // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
     std::cout << "Server has started..."sv << std::endl;
-    
+    /*
     net::steady_timer t{ioc, 30s};
     t.async_wait([](sys::error_code ec) {
         std::cout << "Timer expired"s << std::endl;
     });
-    
+    */
     RunWorkers(num_threads, [&ioc] {
         ioc.run();
     });
