@@ -57,7 +57,7 @@ Recorder recorder(ma_format_u8, 1);
         udp::socket socket(io_context, udp::v4());
 	std::string adr;
 std::cout<<"adress? 127.0.0.1"<<std::endl;
-getline(std::cin,adr);
+std::getline(std::cin, adr);
         // Запускаем сервер в цикле, чтобы можно было работать со многими клиентами
             // Создаём буфер достаточного размера, чтобы вместить датаграмму.
            // std::array<char, 65000> recv_buf;
