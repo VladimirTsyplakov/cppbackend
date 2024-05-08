@@ -1,19 +1,19 @@
-#include "sdk.h"
+//#include "sdk.h"
 //
+#include "http_server.h"
+
 #include <boost/asio/signal_set.hpp>
-#include <iostream>
+//#include <iostream>
 #include <mutex>
 #include <thread>
 #include <vector>
 
 #include <boost/asio/steady_timer.hpp>
 
-#include "http_server.h"
-
-namespace {
 namespace net = boost::asio;
 using namespace std::literals;
 namespace sys = boost::system;
+namespace beast = boost::beast;
 namespace http = boost::beast::http;
 
 // Запрос, тело которого представлено в виде строки
@@ -79,7 +79,7 @@ void RunWorkers(unsigned n, const Fn& fn) {
     fn();
 }
 
-}  // namespace
+////////////////////////  // namespace
 
 int main() {
     const unsigned num_threads = std::thread::hardware_concurrency();
@@ -98,6 +98,7 @@ int main() {
     constexpr net::ip::port_type port = 8080;
     http_server::ServeHttp(ioc, {address, port}, [](auto&& req, auto&& sender) {
         // sender(HandleRequest(std::forward<decltype(req)>(req)));
+	sender(HandleRequest(std::forward<decltype(req)>(req)));
     });
 
     // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
@@ -113,3 +114,4 @@ int main() {
     });
     std::cout << "Shutting down"sv << std::endl;
 }
+
