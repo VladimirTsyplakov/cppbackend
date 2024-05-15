@@ -47,19 +47,19 @@ public:
 
         if (target == endpoint) {
             send(json_response(http::status::ok, Serialize(game_.GetMaps())));
-        } else if (target.starts_with(endpoint) && !target.ends_with("/"sv)) {
-            std::string_view id = target.substr(endpoint.size() + 1);
-            auto map_id = Map::Id{std::string{id}};
-            const auto* map_ptr = game_.FindMap(map_id);
+        } 	else if (target.starts_with(endpoint) && !target.ends_with("/"sv)) {
+            	std::string_view id = target.substr(endpoint.size() + 1);
+            	auto map_id = Map::Id{std::string{id}};
+            	const auto* map_ptr = game_.FindMap(map_id);
 
-            if (map_ptr == nullptr)
-                send(json_response(http::status::not_found,
-                                   SerializeError("mapNotFound", "Map not found")));
-            else
-                send(json_response(http::status::ok, Serialize(*map_ptr)));
-        } else if (target.starts_with("/api/"sv)) {
-            send(json_response(http::status::bad_request,
-                               SerializeError("badRequest", "Bad request")));
+            		if (map_ptr == nullptr)
+                	send(json_response(http::status::not_found,
+                        SerializeError("mapNotFound", "Map not found")));
+            		else
+                	send(json_response(http::status::ok, Serialize(*map_ptr)));
+        } 	else if (target.starts_with("/api/"sv)) {
+            	send(json_response(http::status::bad_request,
+                SerializeError("badRequest", "Bad request")));
         }
     }
 

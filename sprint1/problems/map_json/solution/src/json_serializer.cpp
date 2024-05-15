@@ -8,10 +8,11 @@ using namespace std::literals;
 
 json::value SerializeError(std::string code, std::string message) {
     json::object object;
-
-    object["code"] = json::serialize(code);
-    object["message"] = json::serialize(message);
-
+	//Json object; /////////////////////////////////////////// or stringview
+//    object["code"] = json::serialize(code);
+//    object["message"] = json::serialize(message);
+	object["code"] = code;
+	object["message"] = message;
     return json::value(std::move(object));
 }
 
