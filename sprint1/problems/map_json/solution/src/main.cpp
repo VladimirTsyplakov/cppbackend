@@ -54,6 +54,7 @@ StringResponse HandleRequest(StringRequest&& req) {
         std::string_view ques = req.method_string();
         if(ques == "GET"){
                 std::string_view tar = req.target();
+        std::transform(map.begin(), map.end() , [](
     // Здесь можно обработать запрос и сформировать ответ, но пока всегда отвечаем: Hello
 //              greet = "<strong>Hello</strong>";
                 greet = "Hello, ";
@@ -91,7 +92,7 @@ int main(int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
     const unsigned num_threads = std::thread::hardware_concurrency();
-    net::io_context ioc(num_threads);
+///    net::io_context ioc(num_threads);
 
 
     try {
@@ -99,7 +100,7 @@ int main(int argc, const char* argv[]) {
         model::Game game = json_loader::LoadGame(argv[1]);
 
         // 2. Инициализируем io_context
-        const unsigned num_threads = std::thread::hardware_concurrency();
+//        const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
 
         // 3. Добавляем асинхронный обработчик сигналов SIGINT и SIGTERM
@@ -129,7 +130,6 @@ int main(int argc, const char* argv[]) {
         });
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+        return EXIT_FAILURE;}
 std::cout << "Shutting down"sv << std::endl;
 }

@@ -15,7 +15,7 @@ std::string to_string(boost::json::string string) {
 }
 
 void LoadRoads(Map& map, const boost::json::array& roads) {
-    for (const auto& road_element: roads) {
+    for (const auto& road_element : roads) {
         const auto& road_obj = road_element.as_object();
 
         int start_x = road_obj.at("x0").as_int64();
@@ -44,7 +44,7 @@ void LoadRoads(Map& map, const boost::json::array& roads) {
 }
 
 void LoadBuildings(Map& map, const boost::json::array& buildings) {
-    for (const auto& building_element: buildings) {
+    for (const auto& building_element : buildings) {
         const auto& building_obj = building_element.as_object();
 
         int x = building_obj.at("x").as_int64();
@@ -62,7 +62,7 @@ void LoadBuildings(Map& map, const boost::json::array& buildings) {
 }
 
 void LoadOffices(Map& map, const boost::json::array& offices) {
-    for (const auto& office_element: offices) {
+    for (const auto& office_element : offices) {
         const auto& office_obj = office_element.as_object();
 
         auto id = to_string(office_obj.at("id").as_string());
@@ -81,7 +81,9 @@ void LoadOffices(Map& map, const boost::json::array& offices) {
 
 model::Game LoadGame(const std::filesystem::path& json_path) {
     Game game;
-
+		
+if (!std::filesystem::exists(json_path)){std::cout<<"wrong path";}
+	else{
     std::ifstream stream(json_path);
     std::stringstream buffer;
     buffer << stream.rdbuf();
@@ -89,7 +91,7 @@ model::Game LoadGame(const std::filesystem::path& json_path) {
     auto obj = boost::json::parse(buffer.str()).as_object();
 
     const auto& maps = obj.at("maps").as_array();
-    for (const auto& map_element: maps) {
+    for (const auto& map_element : maps) {
         const auto& map_obj = map_element.as_object();
 
         auto id = to_string(map_obj.at("id").as_string());
@@ -105,5 +107,5 @@ model::Game LoadGame(const std::filesystem::path& json_path) {
 
     return game;
 }
-
+}
 }  // namespace json_loader
