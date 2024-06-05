@@ -8,9 +8,6 @@ using namespace std::literals;
 
 json::value SerializeError(std::string code, std::string message) {
     json::object object;
-	//Json object; /////////////////////////////////////////// or stringview
-//    object["code"] = json::serialize(code);
-//    object["message"] = json::serialize(message);
 	object["code"] = code;
 	object["message"] = message;
     return json::value(std::move(object));
@@ -19,7 +16,7 @@ json::value SerializeError(std::string code, std::string message) {
 json::value Serialize(const Game::Maps& maps) {
     json::array maps_array;
 
-    for (const auto& map: maps) {
+    for (const auto& map : maps) {
         json::object res_object;
         res_object["id"] = *map.GetId();
         res_object["name"] = map.GetName();
@@ -85,15 +82,30 @@ json::value Serialize(const Map& map) {
     object["name"] = map.GetName();
 
     json::array roads_array;
-    for (const auto& road: map.GetRoads()) {
+    /*for (const auto& road: map.GetRoads()) {
         roads_array.push_back(details::Serialize(road));
     }
-    object["roads"] = roads_array;
+    object["roads"] = roads_array;*/
+	const auto roads = map.GetRoads();
+	std::transform( roads.begin(),
+			roads.end(), std::back_inserter(roads_array),
+			[](const Road& a)
+			{return details::Serialize(a);});
+	object["roads"] = roads_array;
+/*
+
+*/
 
     json::array buildings_array;
-    for (const auto& building: map.GetBuildings()) {
+	const auto buildings = map.GetBuildings();
+	std::transform( buildings.begin(), 
+			buildings.end(), std::back_inserter(roads_array),
+			[](const Building& b)
+			{return details::Serialize(b);});
+
+/*    for (const auto& building: map.GetBuildings()) {
         buildings_array.push_back(details::Serialize(building));
-    }
+    }*/
     object["buildings"] = buildings_array;
 
     json::array offices_array;
