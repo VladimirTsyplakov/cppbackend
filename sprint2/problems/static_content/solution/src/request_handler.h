@@ -126,7 +126,7 @@ public:
 
         auto json_response = [&request](http::status status, 
                     json::value value, 
-                    std::string_view cont_type = "application/json") {
+                    std::string_view cont_type = "application/json"sv) {
             return MakeStringResponse(status, json::serialize(value),
                                       request.version(), request.keep_alive(), cont_type);
         };
@@ -143,7 +143,7 @@ public:
     assert(!IsSubPath(Decode(target), root_path));*/
 ///////////
 //если запрос начинается с АРI ! нужны карты
-if(target.starts_with("api"sv)){
+if(target.starts_with("/api/"sv)){
     //если запрос на все карты"/api/v1/maps"
         if (target == endpoint){send(json_response(http::status::ok, Serialize(game_.GetMaps())));}
         //если запрос на какую!то конкретную карту /api/v1/maps/тратата
@@ -166,10 +166,17 @@ if(target.starts_with("api"sv)){
 //если запрос на файл или каталог
 else{
     auto dec_target = Decode(target);
-    std::filesystem::path path = std::filesystem::weakly_canonical(base_cat_path_/dec_target);
+    std::filesystem::path path = base_cat_path_;
+	path += dec_target;
+/*	std::string test{base_cat_path_};
+	std::string test2{dec_target};
+	std::string test3 = test+test2;
+std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
         //если на каталог
     if (dec_target.string().ends_with("/")) {
         //если каталог валидный
+/////////////////////////////////////////////////////////////////////////////////////////////??????????????????
+		
         if (dec_target == base_cat_path_) {
             //вернуть index html
             http::response<http::file_body> res;
@@ -205,20 +212,23 @@ else{
             if (IsSubPath(path, base_cat_path_)) {
                 // он существует?
                 using namespace http;
-                auto dec_target = Decode(target);
-                std::filesystem::path file_path = std::filesystem::weakly_canonical(base_cat_path_ / dec_target);
+//                auto dec_target = Decode(target);
+//                std::filesystem::path file_path = std::filesystem::weakly_canonical(base_cat_path_ += dec_target);
 
                 file_body::value_type file;
 
-                if (boost::system::error_code ec; file.open(file_path.string().c_str(), beast::file_mode::read, ec), ec) {
-                    send(json_response(http::status::not_found, SerializeError("notFound", "Not Found"), "text/plain"));
+                if (boost::system::error_code ec; file.open(path.string().c_str(), 
+							beast::file_mode::read, ec), ec) {
+                    send(json_response(http::status::not_found, SerializeError(
+"The file notFound"
+, "Not Found"), "text/plain"));
                 }
                 else//выдаем файл
                 {
                     response<http::file_body> res;
                     res.version(11);  // HTTP/1.1
                     res.result(status::ok);
-                    res.insert(field::content_type, type_file_content(file_path));
+                    res.insert(field::content_type, type_file_content(path));
 
                     //file_body::value_type file;
                     res.body() = std::move(file);

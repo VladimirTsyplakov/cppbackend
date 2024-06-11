@@ -82,7 +82,7 @@ void LoadOffices(Map& map, const boost::json::array& offices) {
 model::Game LoadGame(const std::filesystem::path& json_path) {
     Game game;
 
-if (!std::filesystem::exists(json_path)){std::cout<<"wrong path"; return game;}
+if (!std::filesystem::exists(json_path)){std::cout<<"wrong path of json"<<std::endl; return game;}
 	else{
     		std::ifstream stream(json_path);
     		std::stringstream buffer;
