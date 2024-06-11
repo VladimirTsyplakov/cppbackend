@@ -220,15 +220,7 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
             //если на файл в static
             if (IsSubPath(path, base_cat_path_)) {
                 // он существует?
-                using namespace                                 http::file_body::value_type file2;
-                if(sys::error_code ec; file2.open(path.string().c_str(), beast::file_mode::read, ec), ec) {
-                std::cout << "Failed to open file "<< path.string().c_str() << ec.what()<< std::endl;}
-                                http::response<http::file_body> res2;
-                res2.body() = std::move(file2);
-
-            SyncWriteOStreamAdapter adapter{ std::cout };
-            boost::beast::http::write(adapter, res2);
-http;
+                using namespace http;
 //                auto dec_target = Decode(target);
 //                std::filesystem::path file_path = std::filesystem::weakly_canonical(base_cat_path_ += dec_target);
 
