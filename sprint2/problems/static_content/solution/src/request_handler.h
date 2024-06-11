@@ -106,11 +106,11 @@ public:
     }
     return true;
 }
-     std::string_view extention_to_content(const std::string ext)
+     std::string extention_to_content(const std::string ext)
     { const auto it = type_map_.find(ext);
         return (it != type_map_.end()) ? it->second : "application/octet-stream";}
 //обрабатываем строку
-    std::string_view type_file_content(const std::string path)
+    std::string type_file_content(const std::string path)
     {
     //получаем субстроку
     std::string lowpath = path.substr(path.find_last_of('.'));
@@ -175,20 +175,22 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
         //если на каталог
     if (dec_target.string().ends_with("/")) {
         //если каталог валидный
-/////////////////////////////////////////////////////////////////////////////////////////////??????????????????
-		
-        if (dec_target == base_cat_path_) {
+
+        if (IsSubPath(path, base_cat_path_)) {
             //вернуть index html
+
             http::response<http::file_body> res;
             res.version(11);  // HTTP/1.1
             res.result(http::status::ok);
             res.insert(http::field::content_type, "text/html"sv);
+	    http::file_body::value_type file;
 
-            http::file_body::value_type file;
-
-            if (sys::error_code ec; file.open("~/cpp-backend/sprint2/problems/static_content/solution/static/index.html",
+            path += std::filesystem::weakly_canonical(Decode("index.html"));
+            if (sys::error_code ec; 
+		file.open(
+		path.string().c_str(),
                 beast::file_mode::read, ec), ec) {
-                std::cout << "Failed to open file "sv << "index.html " << ec.what()<< std::endl;
+                std::cout << "Failed to open file "<< path.string().c_str() << ec.what()<< std::endl;
                // return EXIT_FAILURE; 
             }
 
@@ -196,8 +198,15 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
             // Метод prepare_payload заполняет заголовки Content-Length и Transfer-Encoding
             // в зависимости от свойств тела сообщения
             res.prepare_payload();
-            SyncWriteOStreamAdapter adapter{ std::cout };
-            boost::beast::http::write(adapter, res);
+		send(res);
+		//печатаем отчет
+		http::file_body::value_type file2;
+                if(sys::error_code ec; file2.open(path.string().c_str(), beast::file_mode::read, ec), ec) {
+                std::cout << "Failed to open file "<< path.string().c_str() << ec.what()<< std::endl;}
+		http::response<http::file_body> res2;
+                res2.body() = std::move(file2);
+		SyncWriteOStreamAdapter adapter{ std::cout };
+		boost::beast::http::write(adapter, res2);
         }
         //послать  400
         else {
@@ -211,7 +220,15 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
             //если на файл в static
             if (IsSubPath(path, base_cat_path_)) {
                 // он существует?
-                using namespace http;
+                using namespace                                 http::file_body::value_type file2;
+                if(sys::error_code ec; file2.open(path.string().c_str(), beast::file_mode::read, ec), ec) {
+                std::cout << "Failed to open file "<< path.string().c_str() << ec.what()<< std::endl;}
+                                http::response<http::file_body> res2;
+                res2.body() = std::move(file2);
+
+            SyncWriteOStreamAdapter adapter{ std::cout };
+            boost::beast::http::write(adapter, res2);
+http;
 //                auto dec_target = Decode(target);
 //                std::filesystem::path file_path = std::filesystem::weakly_canonical(base_cat_path_ += dec_target);
 
@@ -219,9 +236,7 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
 
                 if (boost::system::error_code ec; file.open(path.string().c_str(), 
 							beast::file_mode::read, ec), ec) {
-                    send(json_response(http::status::not_found, SerializeError(
-"The file notFound"
-, "Not Found"), "text/plain"));
+                    send(json_response(http::status::not_found, SerializeError("The file notFound", "Not Found"), "text/plain"));
                 }
                 else//выдаем файл
                 {
@@ -229,14 +244,25 @@ std::filesystem::path path = std::filesystem::weakly_canonical(test3);*/
                     res.version(11);  // HTTP/1.1
                     res.result(status::ok);
                     res.insert(field::content_type, type_file_content(path));
-
                     //file_body::value_type file;
                     res.body() = std::move(file);
                     // Метод prepare_payload заполняет заголовки Content-Length и Transfer-Encoding
                     // в зависимости от свойств тела сообщения
                     res.prepare_payload();
-                    SyncWriteOStreamAdapter adapter{ std::cout };
-                    boost::beast::http::write(adapter, res);
+                    //SyncWriteOStreamAdapter adapter{ std::cout };
+                    //boost::beast::http::write(adapter, res);
+		    send(res);
+		//печатаем отчет
+		http::file_body::value_type file2;
+                if(sys::error_code ec; file2.open(path.string().c_str(), beast::file_mode::read, ec), ec) {
+                std::cout << "Failed to open file "<< path.string().c_str() << ec.what()<< std::endl;}
+                http::response<http::file_body> res2;
+                res2.body() = std::move(file2);
+
+            SyncWriteOStreamAdapter adapter{ std::cout };
+            boost::beast::http::write(adapter, res2);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
                 }//выдали файл
             }//на файл в static 
         //послать
