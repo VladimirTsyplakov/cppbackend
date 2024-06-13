@@ -142,22 +142,23 @@ public:
     assert(IsSubPath(Decode(target), root_path));
     assert(!IsSubPath(Decode(target), root_path));*/
 ///////////
+
 //если запрос начинается с АРI ! нужны карты
 if(target.starts_with("/api/"sv)){
     //если запрос на все карты"/api/v1/maps"
         if (target == endpoint){send(json_response(http::status::ok, Serialize(game_.GetMaps())));}
         //если запрос на какую!то конкретную карту /api/v1/maps/тратата
         else if (target.starts_with(endpoint) && !target.ends_with("/"sv)) {
-                std::string_view id = target.substr(endpoint.size() + 1);
+		std::string_view id = target.substr(endpoint.size() + 1);
                 auto map_id = Map::Id{std::string{id}};
                 const auto* map_ptr = game_.FindMap(map_id);
-
             //если карты с таким ИД не существует
                     if (map_ptr == nullptr)
                     send(json_response(http::status::not_found,
                         SerializeError("mapNotFound", "Map not found")));
                     else
-                    send(json_response(http::status::ok, Serialize(*map_ptr)));}
+                    {send(json_response(http::status::ok, Serialize(*map_ptr)));}}
+
         //если запрос начинается на /api/ заканчивается /
         else if (target.starts_with("/api/"sv)) {
                 send(json_response(http::status::bad_request,

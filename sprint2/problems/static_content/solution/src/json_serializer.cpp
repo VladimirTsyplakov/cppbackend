@@ -1,5 +1,7 @@
 #include "json_serializer.h"
 #include <string>
+#include <iostream>
+
 namespace json_serializer {
 
 namespace json = boost::json;
@@ -53,7 +55,6 @@ json::value Serialize(const Building& building) {
     object["y"] = position.y;
     object["w"] = size.width;
     object["h"] = size.height;
-
     return json::value(std::move(object));
 }
 
@@ -103,9 +104,9 @@ json::value Serialize(const Map& map) {
 			[](const Building& b)
 			{return details::Serialize(b);});
 
-/*    for (const auto& building: map.GetBuildings()) {
+    for (const auto& building: map.GetBuildings()) {
         buildings_array.push_back(details::Serialize(building));
-    }*/
+    }
     object["buildings"] = buildings_array;
 
     json::array offices_array;

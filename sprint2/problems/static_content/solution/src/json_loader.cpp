@@ -51,7 +51,6 @@ void LoadBuildings(Map& map, const boost::json::array& buildings) {
         int y = building_obj.at("y").as_int64();
         int width = building_obj.at("w").as_int64();
         int height = building_obj.at("h").as_int64();
-
         map.AddBuilding(Building {
             Rectangle {
                 Point { x, y },
