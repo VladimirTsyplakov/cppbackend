@@ -20,6 +20,7 @@ using namespace std::literals;
 class Logger {
     mutable std::mutex mutex;
     std::ofstream log_file_;
+    
     auto GetTime() const {
         if (manual_ts_) {
             return *manual_ts_;
