@@ -1,5 +1,5 @@
 #include "logger.h"
-#define BOOST_LOG_DYN_LINK 1
+//#define BOOST_LOG_DYN_LINK 1
 namespace json_logger {
 
 namespace logging = boost::log;
