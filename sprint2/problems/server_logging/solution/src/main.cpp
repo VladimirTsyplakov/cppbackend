@@ -91,12 +91,14 @@ if (argc != 2 && argc != 3) {
         });
 
         // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
-        std::cout << "Server has started..."sv << std::endl;
+//        std::cout << "Server has started..."sv << std::endl;
 	logger.LogServerStarted({address, port});
         // 6. Запускаем обработку асинхронных операций
         RunWorkers(std::max(1u, num_threads), [&ioc] {
             ioc.run();
         });
+	logger.LogServerNormalFinish();
+
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
 	json_logger::JsonLogger::GetInstance().LogServerErrorFinish(ex);
