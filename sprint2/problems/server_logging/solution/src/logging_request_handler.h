@@ -44,8 +44,7 @@ template <class RequestHandler>
 class LoggingRequestHandler {
 public:
     LoggingRequestHandler(RequestHandler& request_handler)
-        : request_handler_(request_handler) {
-    }
+        : request_handler_(request_handler) {}
 
     template <typename Body, typename Allocator, typename Send>
     void operator()(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send) {
@@ -59,7 +58,6 @@ public:
 
         detail::DurationMeasure dur_measure;
 
-        //decltype(req)???
         request_handler_(std::forward<ReqType>(req), [&send, &dur_measure](auto&& response){
             json_logger::JsonLogger::GetInstance().LogResponse(
                         dur_measure.GetDuration(),

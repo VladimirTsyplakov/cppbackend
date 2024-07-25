@@ -68,25 +68,27 @@ if (argc != 2 && argc != 3) {
         model::Game game = json_loader::LoadGame(argv[1]);
 	//	определляем корневой каталог
 	    std::string base_cat_path = argv[2];
-
+	auto logger = json_logger::JsonLogger::GetInstance();
         // 2. Инициализируем io_context
 //        const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
 
         // 3. Добавляем асинхронный обработчик сигналов SIGINT и SIGTERM
 	    net::signal_set signals(ioc, SIGINT, SIGTERM);
+
     	signals.async_wait([&ioc](const sys::error_code& ec, [[maybe_unused]] int signal_number) {
         if (!ec) {ioc.stop();}});
         
 	// 4. Создаём обработчик HTTP-запросов и связываем его с моделью игры
         request_handler::RequestHandler handler{game, base_cat_path};
 	auto l_handler = logging_handler::MakeHandler(handler);
-        json_logger::JsonLogger& logger = json_logger::JsonLogger::GetInstance();
+	std::cout<<"l_handler on"<<std::endl;
 
-	// 5. Запустить обработчик HTTP-запросов, делегируя их обработчику запросов
+// 5. Запустить обработчик HTTP-запросов, делегируя их обработчику запросов
 	const auto address = net::ip::make_address("0.0.0.0");
 	constexpr net::ip::port_type port = 8080;
-        http_server::ServeHttp(ioc, {address, port}, [&l_handler](auto&& req, auto&& send) {
+        
+	http_server::ServeHttp(ioc, {address, port}, [&l_handler](auto&& req, auto&& send) {
         l_handler(std::forward<decltype(req)>(req), std::forward<decltype(send)>(send));
         });
 
