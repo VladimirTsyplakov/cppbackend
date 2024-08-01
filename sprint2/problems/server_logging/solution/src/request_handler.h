@@ -121,7 +121,7 @@ public:
     }
 
     template <typename Body, typename Allocator, typename Send>
-    void operator()(http::request<Body, http::basic_fields<Allocator>>&& request, Send&& send) {
+    void operator()(const net::ip::tcp::endpoint&, http::request<Body, http::basic_fields<Allocator>>&& request, Send&& send) {
         using namespace json_serializer;
 
         auto json_response = [&request](http::status status, 

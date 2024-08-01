@@ -43,28 +43,28 @@ using namespace std::string_literals;
 template <class RequestHandler>
 class LoggingRequestHandler {
 public:
-    LoggingRequestHandler(RequestHandler& request_handler)
+   explicit LoggingRequestHandler(RequestHandler& request_handler)
         : request_handler_(request_handler) {}
 
     template <typename Body, typename Allocator, typename Send>
-    void operator()(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send) {
-        using ReqType = http::request<Body, http::basic_fields<Allocator>>;
-
-        json_logger::JsonLogger::GetInstance().LogRequest(
-                    req.at(http::field::sender),
-                    req.target(),
-                    req.method_string()
-        );
+    void operator()(const boost::asio::ip::tcp::endpoint& endpoint, http::request<Body, 
+			http::basic_fields<Allocator>>&& req, Send&& send) {
+        
+	using ReqType = http::request<Body, http::basic_fields<Allocator>>;
+        
+		json_logger::JsonLogger::GetInstance().json_logger::JsonLogger::LogRequest(endpoint, req);
 
         detail::DurationMeasure dur_measure;
 
-        request_handler_(std::forward<ReqType>(req), [&send, &dur_measure](auto&& response){
+        request_handler_ (endpoint, std::move(req), [s = std::forward<Send>(send), 
+						     d = std::forward<detail::DurationMeasure>(dur_measure)
+						    ] (auto&& response) {
             json_logger::JsonLogger::GetInstance().LogResponse(
-                        dur_measure.GetDuration(),
+                        d.GetDuration(),
                         static_cast<int>(response.result()),
-                        response.at(http::field::content_type)
+                       response.at(http::field::content_type)
             );
-            send(response);
+            s(response);
         });
     }
 private:
@@ -77,3 +77,4 @@ LoggingRequestHandler<RequestHandler> MakeHandler(RequestHandler& rh) {
 }
 
 } // namespace logging_handler
+

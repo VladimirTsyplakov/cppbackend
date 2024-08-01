@@ -22,6 +22,10 @@ void SessionBase::Read() {
                      beast::bind_front_handler(&SessionBase::OnRead, GetSharedThis()));
 }
 
+tcp::endpoint SessionBase::GetEndpoint() const {
+    return stream_.socket().remote_endpoint();
+}
+
 void SessionBase::Run() {
     // Вызываем метод Read, используя executor объекта stream_.
     // Таким образом вся работа со stream_ будет выполняться, используя его executor

@@ -16,6 +16,7 @@
 #include <boost/log/utility/manipulators/add_value.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/http.hpp>
+#include <mutex>
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime);
 BOOST_LOG_ATTRIBUTE_KEYWORD(additional_data, "AdditionalData", boost::json::value);
@@ -42,10 +43,27 @@ public:
     void LogServerStarted(const tcp::endpoint& ep);
     void LogServerNormalFinish();
     void LogServerErrorFinish(const std::exception& ec);
-    void LogRequest(std::string_view client_ip, std::string_view target, std::string_view method);
+    
+    template <typename Body, typename Allocator>    
+    void LogRequest(const boost::asio::ip::tcp::endpoint &endpoint, 
+			const http::request<Body, http::basic_fields<Allocator>>& req) {
+    json::value data = {
+        {"ip", endpoint.address().to_string()},
+        {"URI", req.target()},
+        {"method", req.method_string()}
+    };
+    LogJson("request received", data);
+}
+
+    
     void LogResponse(std::chrono::steady_clock::duration dur, unsigned int code, std::string_view content_type);
-private:
+    mutable std::mutex mutex;
     JsonLogger();
+    //JsonLogger(JsonLogger& op);
+
+//private:
+//    JsonLogger();
+//    JsonLogger(JsonLogger& op);
 };
 
 } // namespace json_logger

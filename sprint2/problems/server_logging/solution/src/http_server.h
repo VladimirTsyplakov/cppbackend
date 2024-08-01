@@ -55,7 +55,7 @@ public:
     // Запрещаем копирование и присваивание объектов SessionBase и его наследников
     SessionBase(const SessionBase&) = delete;
     SessionBase& operator=(const SessionBase&) = delete;
-
+    [[nodiscard]] tcp::endpoint GetEndpoint() const;
     void Run();
 private:
     void OnRead(beast::error_code ec, [[maybe_unused]] std::size_t bytes_read);
@@ -89,7 +89,7 @@ private:
         // Захватываем умный указатель на текущий объект Session в лямбде,
         // чтобы продлить время жизни сессии до вызова лямбды.
         // Используется generic-лямбда функция, способная принять response произвольного типа
-        request_handler_(std::move(request), [self = this->shared_from_this()](auto&& response) {
+        request_handler_(GetEndpoint(), std::move(request), [self = this->shared_from_this()](auto&& response) {
             self->Write(std::move(response));
         });
     }

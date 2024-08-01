@@ -68,7 +68,8 @@ if (argc != 2 && argc != 3) {
         model::Game game = json_loader::LoadGame(argv[1]);
 	//	определляем корневой каталог
 	    std::string base_cat_path = argv[2];
-	auto logger = json_logger::JsonLogger::GetInstance();
+	//auto logger = json_logger::JsonLogger::GetInstance();
+	//json_logger::JsonLogger::GetInstance().LogServerStarted({address, port});;
         // 2. Инициализируем io_context
 //        const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
@@ -82,27 +83,28 @@ if (argc != 2 && argc != 3) {
 	// 4. Создаём обработчик HTTP-запросов и связываем его с моделью игры
         request_handler::RequestHandler handler{game, base_cat_path};
 	auto l_handler = logging_handler::MakeHandler(handler);
-	std::cout<<"l_handler on"<<std::endl;
 
 // 5. Запустить обработчик HTTP-запросов, делегируя их обработчику запросов
 	const auto address = net::ip::make_address("0.0.0.0");
 	constexpr net::ip::port_type port = 8080;
-        
-	http_server::ServeHttp(ioc, {address, port}, [&l_handler](auto&& req, auto&& send) {
-        l_handler(std::forward<decltype(req)>(req), std::forward<decltype(send)>(send));
+                json_logger::JsonLogger::GetInstance().LogServerStarted({address, port});
+
+	http_server::ServeHttp(ioc, {address, port}, [&l_handler](auto&& endpoint, auto&&  req, auto&& send) {
+        l_handler(std::forward<decltype(endpoint)>(endpoint), std::forward<decltype(req)>(req), std::forward<decltype(send)>(send));
         });
 
         // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
 //        std::cout << "Server has started..."sv << std::endl;
-	logger.LogServerStarted({address, port});
+	//logger.LogServerStarted({address, port});
         // 6. Запускаем обработку асинхронных операций
         RunWorkers(std::max(1u, num_threads), [&ioc] {
             ioc.run();
         });
-	logger.LogServerNormalFinish();
-
-    } catch (const std::exception& ex) {
+	//logger.LogServerNormalFinish();
+	json_logger::JsonLogger::GetInstance().LogServerNormalFinish();
+        } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
+	//json_logger::JsonLogger::GetInstance().LogServerErrorFinish(ex);
 	json_logger::JsonLogger::GetInstance().LogServerErrorFinish(ex);
         return EXIT_FAILURE;}
 	//std::cout << "Shutting down"sv << std::endl;

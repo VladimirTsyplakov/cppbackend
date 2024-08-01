@@ -12,6 +12,8 @@ namespace http = boost::beast::http;
 
 using tcp = net::ip::tcp;
 
+//std::mutex mutex;
+
 void MyFormatter(logging::record_view const& rec, logging::formatting_ostream& strm) {
     json::value data = *rec[additional_data];
     auto ts = *rec[timestamp];
@@ -26,13 +28,14 @@ void MyFormatter(logging::record_view const& rec, logging::formatting_ostream& s
     strm << result;
 }
 
-
 JsonLogger& JsonLogger::GetInstance() {
+   // std::lock_guard<std::mutex> lock(mutex);
     static JsonLogger logger;
     return logger;
 }
 
 void JsonLogger::LogJson(std::string_view message, const json::value& data) {
+   // std::lock_guard g{mutex};
     BOOST_LOG_TRIVIAL(trace) << logging::add_value(additional_data, data) << message;
 }
 
@@ -68,16 +71,19 @@ void JsonLogger::LogServerErrorFinish(const std::exception& ec) {
     LogJson("server exited", data);
 }
 
-void JsonLogger::LogRequest(std::string_view client_ip, std::string_view target, std::string_view method) {
-    json::value data = {
-        {"ip", client_ip},
-        {"URI", target},
-        {"method", method}
-    };
-    LogJson("request received", data);
-}
+//template <typename Body, typename Allocator>
+//void JsonLogger::LogRequest(const boost::asio::ip::tcp::endpoint &endpoint, 
+//	const http::request<Body, http::basic_fields<Allocator>> &req) {
+//    json::value data = {
+//        {"ip", endpoint.address().to_string()},
+//        {"URI", req.target()},
+//        {"method", req.method_string()}
+//    };
+//    LogJson("request received", data);
+//}
 
-void JsonLogger::LogResponse(std::chrono::steady_clock::duration dur, unsigned int code, std::string_view content_type) {
+void JsonLogger::LogResponse(std::chrono::steady_clock::duration dur, unsigned int code, 
+					std::string_view content_type) {
     using namespace std::chrono;
     json::value data = {
         {"response_time", duration_cast<milliseconds>(dur).count()},
@@ -87,7 +93,6 @@ void JsonLogger::LogResponse(std::chrono::steady_clock::duration dur, unsigned i
     LogJson("response sent", data);
 }
 
-
 JsonLogger::JsonLogger() {
     logging::add_common_attributes();
     logging::add_console_log(
@@ -96,6 +101,15 @@ JsonLogger::JsonLogger() {
         keywords::auto_flush = true
     );
 }
+/*JsonLogger::JsonLogger(JsonLogger& op) {
+    logging::add_common_attributes();
+    logging::add_console_log(
+        std::cout,
+        keywords::format = &MyFormatter,
+        keywords::auto_flush = true);
+	mutex = new std::mutex;
+}*/
+
 
 
 } // namespace json_logger
