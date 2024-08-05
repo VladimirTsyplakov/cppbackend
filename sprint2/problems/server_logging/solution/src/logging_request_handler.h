@@ -52,7 +52,7 @@ public:
         
 	using ReqType = http::request<Body, http::basic_fields<Allocator>>;
         
-		json_logger::JsonLogger::GetInstance().json_logger::JsonLogger::LogRequest(endpoint, req);
+		json_logger::JsonLogger::GetInstance().LogRequest(endpoint, req);
 
         detail::DurationMeasure dur_measure;
 
